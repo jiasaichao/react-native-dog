@@ -9,24 +9,52 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  TabBarIOS
 } from 'react-native';
 
 class jscapp extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedTab: 'list'
+    };
+  }
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to JSC React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
+      <TabBarIOS tintColor="#ee735c">
+        <TabBarIOS.Item  systemIcon="history"
+          onPress={() => {
+            this.setState({
+              selectedTab: 'list'
+            });
+          } }
+          selected={this.state.selectedTab === 'list'}
+          >
+          <Text>11111</Text> 
+        </TabBarIOS.Item>
+        <TabBarIOS.Item  systemIcon="favorites"
+          onPress={() => {
+            this.setState({
+              selectedTab: 'account'
+            });
+          } }
+          selected={this.state.selectedTab === 'account'}
+          >
+          <Text>2222</Text> 
+        </TabBarIOS.Item>
+        <TabBarIOS.Item  systemIcon="contacts"
+          onPress={() => {
+            this.setState({
+              selectedTab: 'edit'
+            });
+          } }
+          selected={this.state.selectedTab === 'edit'}
+          >
+          <Text>3333</Text> 
+        </TabBarIOS.Item>
+        
+      </TabBarIOS>
     );
   }
 }
