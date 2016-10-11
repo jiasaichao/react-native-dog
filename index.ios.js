@@ -10,8 +10,13 @@ import {
   StyleSheet,
   Text,
   View,
-  TabBarIOS
+  TabBarIOS,
+  Navigator
 } from 'react-native';
+
+import Icon from 'react-native-vector-icons/Ionicons';
+
+import {List} from './app/containers/list';
 
 class jscapp extends Component {
   constructor(props) {
@@ -23,37 +28,51 @@ class jscapp extends Component {
   render() {
     return (
       <TabBarIOS tintColor="#ee735c">
-        <TabBarIOS.Item  systemIcon="history"
-          onPress={() => {
-            this.setState({
-              selectedTab: 'list'
-            });
-          } }
+        <Icon.TabBarItem
+          iconName='ios-videocam-outline'
+          selectedIconName='ios-videocam'
           selected={this.state.selectedTab === 'list'}
-          >
-          <Text>11111</Text> 
-        </TabBarIOS.Item>
-        <TabBarIOS.Item  systemIcon="favorites"
           onPress={() => {
             this.setState({
-              selectedTab: 'account'
-            });
-          } }
-          selected={this.state.selectedTab === 'account'}
-          >
-          <Text>2222</Text> 
-        </TabBarIOS.Item>
-        <TabBarIOS.Item  systemIcon="contacts"
+              selectedTab: 'list',
+            })
+          }}>
+          <Navigator
+            initialRoute={{
+              name: 'list',
+              component: List
+            }}
+            configureScene={(route) => {
+              return Navigator.SceneConfigs.FloatFromRight
+            }}
+            renderScene={(route, navigator) => {
+              var Component = route.component
+
+              return <Component {...route.params} navigator={navigator} />
+            }} />
+        </Icon.TabBarItem>
+        <Icon.TabBarItem
+          iconName='ios-recording-outline'
+          selectedIconName='ios-recording'
+          selected={this.state.selectedTab === 'edit'}
           onPress={() => {
             this.setState({
               selectedTab: 'edit'
-            });
-          } }
-          selected={this.state.selectedTab === 'edit'}
-          >
-          <Text>3333</Text> 
-        </TabBarIOS.Item>
-        
+            })
+          }}>
+          <List />
+        </Icon.TabBarItem>
+        <Icon.TabBarItem
+          iconName='ios-more-outline'
+          selectedIconName='ios-more'
+          selected={this.state.selectedTab === 'account'}
+          onPress={() => {
+            this.setState({
+              selectedTab: 'account'
+            })
+          }}>
+          <List />
+        </Icon.TabBarItem>
       </TabBarIOS>
     );
   }
@@ -77,5 +96,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+
 
 AppRegistry.registerComponent('jscapp', () => jscapp);
