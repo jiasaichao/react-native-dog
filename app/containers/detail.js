@@ -4,27 +4,39 @@
  * @flow
  */
 
-// ES5
-var React = require('react-native')
-var Icon = require('react-native-vector-icons/Ionicons')
-var Video = require('react-native-video').default
-var Button = require('react-native-button')
-var config = require('../common/config')
-var request = require('../common/request')
-var util = require('../common/util')
+import React, { Component } from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  TabBarIOS,
+  Navigator,
+  TouchableHighlight,
+  ListView,
+  Image,
+  Dimensions,
+  RefreshControl,
+  ActivityIndicatorIOS,
+  AlertIOS,
+  AsyncStorage,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  ProgressViewIOS,
+} from 'react-native';
 
-var StyleSheet = React.StyleSheet
-var Text = React.Text
-var View = React.View
-var TouchableOpacity = React.TouchableOpacity
-var Dimensions = React.Dimensions
-var ListView = React.ListView
-var Image = React.Image
-var Modal = React.Modal
-var AlertIOS = React.AlertIOS
-var TextInput = React.TextInput
-var ActivityIndicatorIOS = React.ActivityIndicatorIOS
-var AsyncStorage = React.AsyncStorage
+
+import Icon from 'react-native-vector-icons/Ionicons';
+import _ from 'lodash';
+import Video from 'react-native-video';
+
+import request from '../common/request';
+import config from '../common/config';
+import util from '../common/util';
+import Button from 'react-native-button';
+
+
 
 var width = Dimensions.get('window').width
 
@@ -33,15 +45,14 @@ var cachedResults = {
   items: [],
   total: 0
 }
-
-var Detail = React.createClass({
-  getInitialState() {
+class Detail extends Component {
+  constructor(props) {
+    super(props);
     var data = this.props.data
     var ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2
     })
-
-    return {
+    this.state = {
       data: data,
 
       // comments
@@ -67,22 +78,21 @@ var Detail = React.createClass({
       muted: false,
       resizeMode: 'contain',
       repeat: false
-    }
-  },
-
-  _pop() {
+    };
+  }
+  _pop=()=> {
     this.props.navigator.pop()
-  },
+  }
 
-  _onLoadStart() {
+  _onLoadStart=()=> {
     console.log('load start')
-  },
+  }
 
-  _onLoad() {
+  _onLoad=()=> {
     console.log('loads')
-  },
+  }
 
-  _onProgress(data) {
+  _onProgress=(data)=> {
     if (!this.state.videoLoaded) {
       this.setState({
         videoLoaded: true
@@ -106,40 +116,40 @@ var Detail = React.createClass({
     }
 
     this.setState(newState)
-  },
+  }
 
-  _onEnd() {
+  _onEnd=()=> {
     this.setState({
       videoProgress: 1,
       playing: false
     })
-  },
+  }
 
-  _onError(e) {
+  _onError=(e)=> {
     this.setState({
       videoOk: false
     })
-  },
+  }
 
-  _rePlay() {
+  _rePlay=()=> {
     this.refs.videoPlayer.seek(0)
-  },
+  }
 
-  _pause() {
+  _pause=()=> {
     if (!this.state.paused) {
       this.setState({
         paused: true
       })
     }
-  },
+  }
 
-  _resume() {
+  _resume=()=> {
     if (this.state.paused) {
       this.setState({
         paused: false
       })
     }
-  },
+  }
 
   componentDidMount() {
     var that = this
@@ -160,9 +170,9 @@ var Detail = React.createClass({
           })
         }
       })
-  },
+  }
 
-  _fetchData(page) {
+  _fetchData=(page)=> {
     var that = this
 
     this.setState({
@@ -202,13 +212,13 @@ var Detail = React.createClass({
         })
         console.warn(error)
       })
-  },
+  }
 
-  _hasMore() {
+  _hasMore=()=> {
     return cachedResults.items.length !== cachedResults.total
-  },
+  }
 
-  _fetchMoreData() {
+  _fetchMoreData=()=> {
     if (!this._hasMore() || this.state.isLoadingTail) {
       this.setState({
         isLoadingTail: false
@@ -219,9 +229,9 @@ var Detail = React.createClass({
     var page = cachedResults.nextPage
 
     this._fetchData(page)
-  },
+  }
 
-  _renderFooter() {
+  _renderFooter=()=> {
     if (!this._hasMore() && cachedResults.total !== 0) {
       return (
         <View style={styles.loadingMore}>
@@ -235,9 +245,9 @@ var Detail = React.createClass({
     }
 
     return <ActivityIndicatorIOS style={styles.loadingMore} />
-  },
+  }
 
-  _renderRow(row) {
+  _renderRow=(row)=> {
     return (
       <View key={row._id} style={styles.replyBox}>
         <Image style={styles.replyAvatar} source={{uri: util.avatar(row.replyBy.avatar)}} />
@@ -247,27 +257,27 @@ var Detail = React.createClass({
         </View>
       </View>
     )
-  },
+  }
 
-  _focus() {
+  _focus=()=> {
     this._setModalVisible(true)
-  },
+  }
 
-  _blur() {
+  _blur=()=> {
 
-  },
+  }
 
-  _closeModal() {
+  _closeModal=()=> {
     this._setModalVisible(false)
-  },
+  }
 
-  _setModalVisible(isVisible) {
+  _setModalVisible=(isVisible)=> {
     this.setState({
       modalVisible: isVisible
     })
-  },
+  }
 
-  _renderHeader() {
+  _renderHeader=()=> {
     var data = this.state.data
 
     return (
@@ -295,9 +305,9 @@ var Detail = React.createClass({
         </View>
       </View>
     )
-  },
+  }
 
-  _submit() {
+  _submit=()=> {
     var that = this
 
     if (!this.state.content) {
@@ -349,7 +359,7 @@ var Detail = React.createClass({
           AlertIOS.alert('留言失败，稍后重试！')
         })
     })
-  },
+  }
 
   render() {
     var data = this.props.data
@@ -460,7 +470,8 @@ var Detail = React.createClass({
       </View>
     )
   }
-})
+}
+
 
 var styles = StyleSheet.create({
   container: {
@@ -708,5 +719,4 @@ var styles = StyleSheet.create({
     borderBottomColor: '#eee'
   }
 })
-
-module.exports = Detail
+export {Detail}

@@ -27,14 +27,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import request from '../common/request';
 import config from '../common/config';
 import util from '../common/util';
-//var Detail = require('./detail')  
-class Detail extends Component {
-  render() {
-    return (
-      <Text>dddddd</Text>
-    );
-  }
-}
+var Detail = require('./detail')  
+
 
 var width = Dimensions.get('window').width
 
@@ -83,7 +77,7 @@ class Item extends Component {
       })
   }
 
-  render = () => {
+  render(){
     var row = this.state.row
 
     return (

@@ -17,6 +17,8 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import {List} from './app/containers/list';
+import {Account} from './app/containers/account';
+import {Edit} from './app/containers/edit';
 
 class jscapp extends Component {
   constructor(props) {
@@ -60,7 +62,7 @@ class jscapp extends Component {
               selectedTab: 'edit'
             })
           }}>
-          <List />
+          <Edit />
         </Icon.TabBarItem>
         <Icon.TabBarItem
           iconName='ios-more-outline'
@@ -71,7 +73,7 @@ class jscapp extends Component {
               selectedTab: 'account'
             })
           }}>
-          <List />
+          <Account />
         </Icon.TabBarItem>
       </TabBarIOS>
     );
