@@ -30,12 +30,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import _ from 'lodash';
 import Video from 'react-native-video';
 
-import request from '../common/request';
-import config from '../common/config';
-import util from '../common/util';
+import {request} from '../common/request';
+import {config} from '../common/config';
+import {util} from '../common/util';
 
 
-import {ImagePickerManager} from 'NativeModules';
+import { ImagePickerManager } from 'NativeModules';
 var ImagePicker = ImagePickerManager;
 
 import RNAudio from 'react-native-audio';
@@ -60,8 +60,8 @@ var videoOptions = {
   mediaType: 'video',
   durationLimit: 10,
   noData: false,
-  storageOptions: { 
-    skipBackup: true, 
+  storageOptions: {
+    skipBackup: true,
     path: 'images'
   }
 }
@@ -118,19 +118,19 @@ class Edit extends Component {
 
     this.state = state;
   }
-  _onLoadStart=()=> {
+  _onLoadStart = () => {
     console.log('load start')
   }
 
-  _onLoad=()=> {
+  _onLoad = () => {
     console.log('loads')
   }
 
-  _onProgress=(data)=> {
+  _onProgress = (data) => {
     var duration = data.playableDuration
     var currentTime = data.currentTime
     var percent = Number((currentTime / duration).toFixed(2))
-    
+
     this.setState({
       videoTotal: duration,
       currentTime: Number(data.currentTime.toFixed(2)),
@@ -138,7 +138,7 @@ class Edit extends Component {
     })
   }
 
-  _onEnd=()=> {
+  _onEnd = () => {
     if (this.state.recording) {
       AudioRecorder.stopRecording()
 
@@ -150,13 +150,13 @@ class Edit extends Component {
     }
   }
 
-  _onError=(e)=> {
+  _onError = (e) => {
     this.setState({
       videoOk: false
     })
   }
 
-  _preview=()=> {
+  _preview = () => {
     if (this.state.audioPlaying) {
       AudioRecorder.stopPlaying()
     }
@@ -170,7 +170,7 @@ class Edit extends Component {
     this.refs.videoPlayer.seek(0)
   }
 
-  _record=()=> {
+  _record = () => {
     this.setState({
       videoProgress: 0,
       counting: false,
@@ -182,7 +182,7 @@ class Edit extends Component {
     this.refs.videoPlayer.seek(0)
   }
 
-  _counting=()=> {
+  _counting = () => {
     if (!this.state.counting && !this.state.recording && !this.state.audioPlaying) {
       this.setState({
         counting: true
@@ -192,7 +192,7 @@ class Edit extends Component {
     }
   }
 
-  _getToken=(body)=>{
+  _getToken = (body) => {
     var signatureURL = config.api.base + config.api.signature
 
     body.accessToken = this.state.user.accessToken
@@ -200,7 +200,7 @@ class Edit extends Component {
     return request.post(signatureURL, body)
   }
 
-  _upload=(body,type)=> {
+  _upload = (body, type) => {
     var that = this
     var xhr = new XMLHttpRequest()
     var url = config.qiniu.upload
@@ -315,7 +315,7 @@ class Edit extends Component {
     xhr.send(body)
   }
 
-  _pickVideo=()=> {
+  _pickVideo = () => {
     var that = this
 
     ImagePicker.showImagePicker(videoOptions, (res) => {
@@ -330,74 +330,74 @@ class Edit extends Component {
       state.user = this.state.user
       that.setState(state)
 
-      that._getToken({
-        type: 'video',
-        cloud: 'qiniu'
-      })
-      .catch((err) => {
-        console.log(err)
-        AlertIOS.alert('上传出错')
-      })
-        .then((data) => {
-          if (data && data.success) {
-            console.log(data)
-            var token = data.data.token
-            var key = data.data.key
-            var body = new FormData()
+      // that._getToken({
+      //   type: 'video',
+      //   cloud: 'qiniu'
+      // })
+      //   .catch((err) => {
+      //     console.log(err)
+      //     AlertIOS.alert('上传出错')
+      //   })
+      //   .then((data) => {
+      //     if (data && data.success) {
+      //       console.log(data)
+      //       var token = data.data.token
+      //       var key = data.data.key
+      //       var body = new FormData()
 
-            body.append('token', token)
-            body.append('key', key)
-            body.append('file', {
-              type: 'video/mp4',
-              uri: uri,
-              name: key
-            })
+      //       body.append('token', token)
+      //       body.append('key', key)
+      //       body.append('file', {
+      //         type: 'video/mp4',
+      //         uri: uri,
+      //         name: key
+      //       })
 
-            that._upload(body, 'video')
-          }
-        })
+      //       that._upload(body, 'video')
+      //     }
+      //   })
     })
   }
 
-  _uploadAudio=()=> {
+  _uploadAudio = () => {
     var that = this
     var tags = 'app,audio'
     var folder = 'audio'
     var timestamp = Date.now()
 
-    this._getToken({
-      type: 'audio',
-      timestamp: timestamp,
-      cloud: 'cloudinary'
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-    .then((data) => {
-      if (data && data.success) {
-        // data.data
-        var signature = data.data.token
-        var key = data.data.key
-        var body = new FormData()
+    // this._getToken({
+    //   type: 'audio',
+    //   timestamp: timestamp,
+    //   cloud: 'cloudinary'
+    // })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+    //   .then((data) => {
+    //     if (data && data.success) {
+    //       // data.data
+    //       var signature = data.data.token
+    //       var key = data.data.key
+    //       var body = new FormData()
 
-        body.append('folder', folder)
-        body.append('signature', signature)
-        body.append('tags', tags)
-        body.append('timestamp', timestamp)
-        body.append('api_key', config.cloudinary.api_key)
-        body.append('resource_type', 'video')
-        body.append('file', {
-          type: 'video/mp4',
-          uri: that.state.audioPath,
-          name: key
-        })
+    //       body.append('folder', folder)
+    //       body.append('signature', signature)
+    //       body.append('tags', tags)
+    //       body.append('timestamp', timestamp)
+    //       body.append('api_key', config.cloudinary.api_key)
+    //       body.append('resource_type', 'video')
+    //       body.append('file', {
+    //         type: 'video/mp4',
+    //         uri: that.state.audioPath,
+    //         name: key
+    //       })
 
-        that._upload(body, 'audio')
-      }
-    })
+    //       that._upload(body, 'audio')
+    //     }
+    //   })
   }
 
-  _initAudio=()=> {
+  _initAudio = () => {
     var audioPath = this.state.audioPath
 
     console.log(audioPath)
@@ -408,7 +408,7 @@ class Edit extends Component {
       AudioQuality: 'High',
       AudioEncoding: 'aac'
     })
-    
+
     AudioRecorder.onProgress = (data) => {
       this.setState({
         currentTime: Math.floor(data.currentTime)
@@ -422,13 +422,13 @@ class Edit extends Component {
     }
   }
 
-  _closeModal=()=> {
+  _closeModal = () => {
     this.setState({
       modalVisible: false
     })
   }
 
-  _showModal=()=> {
+  _showModal = () => {
     this.setState({
       modalVisible: true
     })
@@ -436,7 +436,7 @@ class Edit extends Component {
 
   componentDidMount() {
     var that = this
-    
+
     AsyncStorage.getItem('user')
       .then((data) => {
         var user
@@ -455,7 +455,7 @@ class Edit extends Component {
     this._initAudio()
   }
 
-  _submit=()=> {
+  _submit = () => {
     var that = this
     var body = {
       title: this.state.title,
@@ -507,19 +507,19 @@ class Edit extends Component {
           </Text>
           {
             this.state.previewVideo && this.state.videoUploaded
-            ? <Text style={styles.toolbarExtra} onPress={this._pickVideo}>更换视频</Text>
-            : null
+              ? <Text style={styles.toolbarExtra} onPress={this._pickVideo}>更换视频</Text>
+              : null
           }
         </View>
 
         <View style={styles.page}>
           {
             this.state.previewVideo
-            ? <View style={styles.videoContainer}>
+              ? <View style={styles.videoContainer}>
                 <View style={styles.videoBox}>
                   <Video
                     ref='videoPlayer'
-                    source={{uri: this.state.previewVideo}}
+                    source={{ uri: this.state.previewVideo }}
                     style={styles.video}
                     volume={5}
                     paused={this.state.paused}
@@ -535,58 +535,58 @@ class Edit extends Component {
                     onError={this._onError} />
                   {
                     !this.state.videoUploaded && this.state.videoUploading
-                    ? <View style={styles.progressTipBox}>
+                      ? <View style={styles.progressTipBox}>
                         <ProgressViewIOS style={styles.progressBar} progressTintColor='#ee735c' progress={this.state.videoUploadedProgress} />
                         <Text style={styles.progressTip}>
                           正在生成静音视频，已完成{(this.state.videoUploadedProgress * 100).toFixed(2)}%
                         </Text>
                       </View>
-                    : null
+                      : null
                   }
 
                   {
                     this.state.recording || this.state.audioPlaying
-                    ? <View style={styles.progressTipBox}>
+                      ? <View style={styles.progressTipBox}>
                         <ProgressViewIOS style={styles.progressBar} progressTintColor='#ee735c' progress={this.state.videoProgress} />
                         {
                           this.state.recording
-                          ? <Text style={styles.progressTip}>
-                            录制声音中
+                            ? <Text style={styles.progressTip}>
+                              录制声音中
                             </Text>
-                          : null
+                            : null
                         }
                       </View>
-                    : null
+                      : null
                   }
 
                   {
                     this.state.recordDone
-                    ? <View style={styles.previewBox}>
+                      ? <View style={styles.previewBox}>
                         <Icon name='ios-play' style={styles.previewIcon} />
                         <Text style={styles.previewText} onPress={this._preview}>
                           预览
                         </Text>
-                    </View>
-                    : null
+                      </View>
+                      : null
                   }
                 </View>
               </View>
-            : <TouchableOpacity style={styles.uploadContainer} onPress={this._pickVideo}>
-              <View style={styles.uploadBox}>
-                <Image source={require('../assets/images/record.png')} style={styles.uploadIcon} />
-                <Text style={styles.uploadTitle}>点我上传视频</Text>
-                <Text style={styles.uploadDesc}>建议时长不超过 20 秒</Text>
-              </View>
-            </TouchableOpacity>
+              : <TouchableOpacity style={styles.uploadContainer} onPress={this._pickVideo}>
+                <View style={styles.uploadBox}>
+                  <Image source={require('../assets/images/record.png')} style={styles.uploadIcon} />
+                  <Text style={styles.uploadTitle}>点我上传视频</Text>
+                  <Text style={styles.uploadDesc}>建议时长不超过 20 秒</Text>
+                </View>
+              </TouchableOpacity>
           }
 
           {
             this.state.videoUploaded
-            ? <View style={styles.recordBox}>
+              ? <View style={styles.recordBox}>
                 <View style={[styles.recordIconBox, (this.state.recording || this.state.audioPlaying) && styles.recordOn]}>
                   {
                     this.state.counting && !this.state.recording
-                    ? <CountDown
+                      ? <CountDown
                         style={styles.countBtn}
                         countType='seconds' // 计时类型：seconds / date
                         auto={true} // 自动开始
@@ -597,36 +597,36 @@ class Edit extends Component {
                         endText='Go' // 结束的文本
                         intervalText={(sec) => {
                           return sec === 0 ? 'Go' : sec
-                        }} />
-                    : <TouchableOpacity onPress={this._counting}>
+                        } } />
+                      : <TouchableOpacity onPress={this._counting}>
                         <Icon name='ios-mic' style={styles.recordIcon} />
                       </TouchableOpacity>
                   }
                 </View>
               </View>
-            : null
+              : null
           }
 
           {
             this.state.videoUploaded && this.state.recordDone
-            ? <View style={styles.uploadAudioBox}>
-              {
-                !this.state.audioUploaded && !this.state.audioUploading
-                ? <Text style={styles.uploadAudioText} onPress={this._uploadAudio}>下一步</Text>
-                : null
-              }
+              ? <View style={styles.uploadAudioBox}>
+                {
+                  !this.state.audioUploaded && !this.state.audioUploading
+                    ? <Text style={styles.uploadAudioText} onPress={this._uploadAudio}>下一步</Text>
+                    : null
+                }
 
-              {
-                this.state.audioUploading
-                ? <Progress.Circle
-                  showsText={true}
-                  size={60}
-                  color={'#ee735c'}
-                  progress={this.state.audioUploadedProgress} />
-                : null
-              }
+                {
+                  this.state.audioUploading
+                    ? <Progress.Circle
+                      showsText={true}
+                      size={60}
+                      color={'#ee735c'}
+                      progress={this.state.audioUploadedProgress} />
+                    : null
+                }
               </View>
-            : null
+              : null
           }
         </View>
 
@@ -640,7 +640,7 @@ class Edit extends Component {
               style={styles.closeIcon} />
             {
               this.state.audioUploaded && !this.state.publishing
-              ? <View style={styles.fieldBox}>
+                ? <View style={styles.fieldBox}>
                   <TextInput
                     placeholder={'给狗狗一句宣言吧'}
                     style={styles.inputField}
@@ -651,25 +651,25 @@ class Edit extends Component {
                       this.setState({
                         title: text
                       })
-                    }}
-                  />
+                    } }
+                    />
                 </View>
-              : null
+                : null
             }
 
             {
               this.state.publishing
-              ? <View style={styles.loadingBox}>
+                ? <View style={styles.loadingBox}>
                   <Text style={styles.loadingText}>耐心等一下，拼命为您生成专属视频中...</Text>
                   {
                     this.state.willPublish
-                    ? <Text style={styles.loadingText}>正在合并视频音频...</Text>
-                    : null
+                      ? <Text style={styles.loadingText}>正在合并视频音频...</Text>
+                      : null
                   }
                   {
                     this.state.publishProgress > 0.3
-                    ? <Text style={styles.loadingText}>开始上传喽！...</Text>
-                    : null
+                      ? <Text style={styles.loadingText}>开始上传喽！...</Text>
+                      : null
                   }
                   <Progress.Circle
                     showsText={true}
@@ -677,16 +677,16 @@ class Edit extends Component {
                     color={'#ee735c'}
                     progress={this.state.publishProgress} />
                 </View>
-              : null
+                : null
             }
 
             <View style={styles.submitBox}>
               {
                 this.state.audioUploaded && !this.state.publishing
-                ? <Button
-                  style={styles.btn}
-                  onPress={this._submit}>发布视频</Button>
-                : null
+                  ? <Button
+                    style={styles.btn}
+                    onPress={this._submit}>发布视频</Button>
+                  : null
               }
             </View>
           </View>
@@ -945,5 +945,5 @@ var styles = StyleSheet.create({
   }
 })
 
-export {Edit}
+export { Edit }
 

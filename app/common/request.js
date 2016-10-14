@@ -1,8 +1,8 @@
 'use strict'
-import querString from 'query-string';
-import _ from 'lodash';
+import queryString from 'query-string';
+//import _ from 'lodash';
 import Mock from 'mockjs';
-import config from './config';
+import {config} from './config';
 
 var request = {}
 
@@ -10,14 +10,14 @@ request.get = function(url, params) {
   if (params) {
     url += '?' + queryString.stringify(params)
   }
-
+console.log('请求地址',url)
   return fetch(url)
-    .then((response) => response.json())
-    .then((response) => Mock.mock(response))
+    .then((response) =>{ return response.json()} )
+    .then((response) => {console.log('执行到了值',Mock.mock(response)); return Mock.mock(response)})
 }
 
 request.post = function(url, body) {
-  var options = _.extend(config.header, {
+  var options = Object.assign({},config.header, {
     body: JSON.stringify(body)
   })
 
@@ -25,4 +25,4 @@ request.post = function(url, body) {
     .then((response) => response.json())
     .then((response) => Mock.mock(response))
 }
-export default {request}
+export {request}

@@ -17,17 +17,19 @@ import {
   Image,
   Dimensions,
   RefreshControl,
-  ActivityIndicatorIOS,
+  ActivityIndicator,
   AlertIOS,
   AsyncStorage,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import request from '../common/request';
-import config from '../common/config';
+import { request } from '../common/request';
+import { config } from '../common/config';
 import util from '../common/util';
-var Detail = require('./detail')  
+import Mock from 'mockjs';
+
+import {Detail} from './detail'
 
 
 var width = Dimensions.get('window').width
@@ -59,25 +61,25 @@ class Item extends Component {
       accessToken: this.props.user.accessToken
     }
 
-    request.post(url, body)
-      .then(function (data) {
-        if (data && data.success) {
-          that.setState({
-            up: up
-          })
-        }
-        else {
-          AlertIOS.alert('点赞失败，稍后重试')
-        }
-      })
-      .catch(function (err) {
-        console.log(err)
+    // request.post(url, body)
+    //   .then(function (data) {
+    //     if (data && data.success) {
+    //       that.setState({
+    //         up: up
+    //       })
+    //     }
+    //     else {
+    //       AlertIOS.alert('点赞失败，稍后重试')
+    //     }
+    //   })
+    //   .catch(function (err) {
+    //     console.log(err)
 
-        AlertIOS.alert('点赞失败，稍后重试')
-      })
+    //     AlertIOS.alert('点赞失败，稍后重试')
+    //   })
   }
 
-  render(){
+  render() {
     var row = this.state.row
 
     return (
@@ -85,7 +87,7 @@ class Item extends Component {
         <View style={styles.item}>
           <Text style={styles.title}>{row.title}</Text>
           <Image
-            source={{ uri: util.thumb(row.qiniu_thumb) }}
+            source={{ uri: row.thumb }}
             style={styles.thumb}
             >
             <Icon
@@ -100,7 +102,7 @@ class Item extends Component {
                 size={28}
                 onPress={this._up}
                 style={[styles.up, this.state.up ? null : styles.down]} />
-              <Text style={styles.handleText} onPress={this._up}>喜欢</Text>
+              <Text style={styles.handleText} >喜欢</Text>
             </View>
             <View style={styles.handleBox}>
               <Icon
@@ -132,28 +134,30 @@ class List extends Component {
     return <Item
       key={row._id}
       user={this.state.user}
-      onSelect={() => this._loadPage(row) }
+      onSelect={() => this._loadPage(row)}
       row={row} />
   }
   componentDidMount = () => {
     var that = this
 
-    AsyncStorage.getItem('user')
-      .then((data) => {
-        var user
+    // AsyncStorage.getItem('user')
+    //   .then((data) => {
+    //     var user
 
-        if (data) {
-          user = JSON.parse(data)
-        }
+    //     if (data) {
+    //       user = JSON.parse(data)
+    //     }
+    //     if (user && user.accessToken) {
+    //       that.setState({
+    //         user: user
+    //       }, function () {
 
-        if (user && user.accessToken) {
-          that.setState({
-            user: user
-          }, function () {
-            that._fetchData(1)
-          })
-        }
-      })
+    //         that._fetchData(1)
+    //       })
+    //     }
+    //   });
+
+    that._fetchData(0)
   }
 
   _fetchData = (page) => {
@@ -171,67 +175,73 @@ class List extends Component {
     }
 
     var user = this.state.user
-    request.get(config.api.base + config.api.creations, {
-      accessToken: user.accessToken,
-      page: page
-    })
-      .then((data) => {
-        if (data && data.success) {
-          if (data.data.length > 0) {
-            data.data.map(function (item) {
-              var votes = item.votes || []
-
-              if (votes.indexOf(user._id) > -1) {
-                item.voted = true
-              }
-              else {
-                item.voted = false
-              }
-
-              return item
-            })
-
-            var items = cachedResults.items.slice()
-
-            if (page !== 0) {
-              items = items.concat(data.data)
-              cachedResults.nextPage += 1
-            }
-            else {
-              items = data.data.concat(items)
-            }
-
-            cachedResults.items = items
-            cachedResults.total = data.total
-
-            if (page !== 0) {
-              that.setState({
-                isLoadingTail: false,
-                dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
-              })
-            }
-            else {
-              that.setState({
+  
+    
+    that.setState({
                 isRefreshing: false,
-                dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
+                dataSource: that.state.dataSource.cloneWithRows( [
+        {
+            "id": "640000199409145329",
+            "thumb": "http://dummyimage.com/1280x720/49e522)",
+            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+            "video": "''"
+        },
+        {
+            "id": "520000199806149975",
+            "thumb": "http://dummyimage.com/1280x720/31b57b)",
+            "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
+            "video": "''"
+        },
+        {
+            "id": "130000201210233663",
+            "thumb": "http://dummyimage.com/1280x720/910025)",
+            "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
+            "video": "''"
+        },
+        {
+            "id": "530000198711055770",
+            "thumb": "http://dummyimage.com/1280x720/111bbd)",
+            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+            "video": "''"
+        },
+        {
+            "id": "710000197806241380",
+            "thumb": "http://dummyimage.com/1280x720/dbc035)",
+            "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
+            "video": "''"
+        },
+        {
+            "id": "210000199602175394",
+            "thumb": "http://dummyimage.com/1280x720/827ce0)",
+            "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
+            "video": "''"
+        },
+        {
+            "id": "310000200612026818",
+            "thumb": "http://dummyimage.com/1280x720/018e3a)",
+            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+            "video": "''"
+        },
+        {
+            "id": "500000198012307654",
+            "thumb": "http://dummyimage.com/1280x720/c8d004)",
+            "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
+            "video": "''"
+        },
+        {
+            "id": "210000197803303306",
+            "thumb": "http://dummyimage.com/1280x720/d96305)",
+            "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
+            "video": "''"
+        },
+        {
+            "id": "33000019800607993X",
+            "thumb": "http://dummyimage.com/1280x720/ae4eec)",
+            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+            "video": "''"
+        }
+    ])
               })
-            }
-          }
-
-        }
-      })
-      .catch((error) => {
-        if (page !== 0) {
-          this.setState({
-            isLoadingTail: false
-          })
-        }
-        else {
-          this.setState({
-            isRefreshing: false
-          })
-        }
-      })
   }
 
   _hasMore = () => {
@@ -274,10 +284,11 @@ class List extends Component {
       return <View style={styles.loadingMore} />
     }
 
-    return <ActivityIndicatorIOS style={styles.loadingMore} />
+    return <ActivityIndicator style={styles.loadingMore} />
   }
 
   _loadPage = (row) => {
+    console.log('将要跳转路由',this.props.navigator);
     this.props.navigator.push({
       name: 'detail',
       component: Detail,
@@ -414,4 +425,4 @@ var styles = StyleSheet.create({
   }
 })
 
-export {List}
+export { List }

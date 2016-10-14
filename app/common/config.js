@@ -28,6 +28,7 @@ let config = {
   api: {
     //base: 'http://127.0.0.1:1234/',
     base: 'http://rap.taobao.org/mockjs/4230/',
+    //base:'http:rap.taobao.org/mockjs/8504/',
     creations: 'api/creations',
     comment: 'api/comments',
     up: 'api/up',
@@ -39,4 +40,4 @@ let config = {
     signature: 'api/signature'
   }
 }
-export default { config}
+export { config}

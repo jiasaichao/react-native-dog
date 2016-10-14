@@ -11,23 +11,92 @@ import {
   Text,
   View,
   TabBarIOS,
+  AsyncStorage,
   Navigator
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import {List} from './app/containers/list';
-import {Account} from './app/containers/account';
-import {Edit} from './app/containers/edit';
+import { List } from './app/containers/list';
+import { Account } from './app/containers/account';
+import { Edit } from './app/containers/edit';
+import { Login } from './app/containers/login';
+import { Slider } from './app/containers/slider';
 
 class jscapp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedTab: 'list'
+      user: null,
+      selectedTab: 'list',
+      /**第一次进入显示轮播图 */
+      entered: false,
+      /**数据加载完成，就是读取数据时的一个滚动 */
+      booted: false,
+      /**是否登录 */
+      logined: false
     };
   }
+  componentDidMount = () => {
+    this._asyncAppStatus();
+  }
+  _logout = () => {
+    AsyncStorage.removeItem('user');
+    this.setState({
+      logined: false,
+      user: null
+    });
+
+  }
+  _asyncAppStatus = () => {
+    
+    AsyncStorage.multiGet(['user', 'entered'])
+      .then((data) => {
+        let userData = data[0][1];
+        let entered = data[1][1];
+        let user;
+        let newState = {
+          booted: true
+        };
+        if (userData) {
+          user = JSON.parse(userData);
+        }
+        if (user && user.accessToken) {
+          newState.user = user;
+          newState.logined = true;
+        }
+        else {
+          newState.logined = false;
+        }
+        if (entered === 'yes') {
+          newState.entered = true;
+        }
+        this.setState(newState);
+      })
+  }
+  _afterLogin = (user) => {
+    var that = this;
+    user = JSON.stringify(user);
+    AsyncStorage.setItem('user', user)
+      .then(() => {
+        that.setState({
+          user: user,
+          logined: true
+        });
+      });
+  }
+  _enterSlide = () => {
+    this.setState({ entered: true }, () => {
+      AsyncStorage.setItem('entered', 'yes');
+    });
+  }
   render() {
+    if (!this.state.entered) {
+      return <Slider enterSlide={this._enterSlide} />
+    }
+    if (!this.state.logined) {
+      return <Login afterLogin={this._afterLogin} />
+    }
     return (
       <TabBarIOS tintColor="#ee735c">
         <Icon.TabBarItem
@@ -38,7 +107,7 @@ class jscapp extends Component {
             this.setState({
               selectedTab: 'list',
             })
-          }}>
+          } }>
           <Navigator
             initialRoute={{
               name: 'list',
@@ -46,12 +115,12 @@ class jscapp extends Component {
             }}
             configureScene={(route) => {
               return Navigator.SceneConfigs.FloatFromRight
-            }}
+            } }
             renderScene={(route, navigator) => {
               var Component = route.component
 
               return <Component {...route.params} navigator={navigator} />
-            }} />
+            } } />
         </Icon.TabBarItem>
         <Icon.TabBarItem
           iconName='ios-recording-outline'
@@ -61,7 +130,7 @@ class jscapp extends Component {
             this.setState({
               selectedTab: 'edit'
             })
-          }}>
+          } }>
           <Edit />
         </Icon.TabBarItem>
         <Icon.TabBarItem
@@ -72,8 +141,8 @@ class jscapp extends Component {
             this.setState({
               selectedTab: 'account'
             })
-          }}>
-          <Account />
+          } }>
+          <Account user={this.state.user} logout={this._logout} />
         </Icon.TabBarItem>
       </TabBarIOS>
     );

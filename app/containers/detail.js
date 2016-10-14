@@ -17,7 +17,7 @@ import {
   Image,
   Dimensions,
   RefreshControl,
-  ActivityIndicatorIOS,
+  ActivityIndicator,
   AlertIOS,
   AsyncStorage,
   Modal,
@@ -28,12 +28,12 @@ import {
 
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import _ from 'lodash';
+
 import Video from 'react-native-video';
 
-import request from '../common/request';
-import config from '../common/config';
-import util from '../common/util';
+import {request} from '../common/request';
+import {config} from '../common/config';
+import {util} from '../common/util';
 import Button from 'react-native-button';
 
 
@@ -179,39 +179,39 @@ class Detail extends Component {
       isLoadingTail: true
     })
 
-    request.get(config.api.base + config.api.comment, {
-      accessToken: this.state.user.accessToken,
-      creation: this.state.data._id,
-      page: page
-    })
-      .then((data) => {
-        if (data && data.success) {
-          if (data.data.length > 0) {
-            var items = cachedResults.items.slice()
+    // request.get(config.api.base + config.api.comment, {
+    //   accessToken: this.state.user.accessToken,
+    //   creation: this.state.data._id,
+    //   page: page
+    // })
+    //   .then((data) => {
+    //     if (data && data.success) {
+    //       if (data.data.length > 0) {
+    //         var items = cachedResults.items.slice()
 
-            items = items.concat(data.data)
-            cachedResults.nextPage += 1
-            cachedResults.items = items
-            cachedResults.total = data.total
+    //         items = items.concat(data.data)
+    //         cachedResults.nextPage += 1
+    //         cachedResults.items = items
+    //         cachedResults.total = data.total
             
-            that.setState({
-              isLoadingTail: false,
-              dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
-            })
-          }
-        }
-        else {
-          that.setState({
-            isLoadingTail: false
-          })
-        }
-      })
-      .catch((error) => {
-        this.setState({
-          isLoadingTail: false
-        })
-        console.warn(error)
-      })
+    //         that.setState({
+    //           isLoadingTail: false,
+    //           dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
+    //         })
+    //       }
+    //     }
+    //     else {
+    //       that.setState({
+    //         isLoadingTail: false
+    //       })
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     this.setState({
+    //       isLoadingTail: false
+    //     })
+    //     console.warn(error)
+    //   })
   }
 
   _hasMore=()=> {
@@ -244,16 +244,16 @@ class Detail extends Component {
       return <View style={styles.loadingMore} />
     }
 
-    return <ActivityIndicatorIOS style={styles.loadingMore} />
+    return <ActivityIndicator style={styles.loadingMore} />
   }
 
   _renderRow=(row)=> {
     return (
       <View key={row._id} style={styles.replyBox}>
-        <Image style={styles.replyAvatar} source={{uri: util.avatar(row.replyBy.avatar)}} />
+        <Image style={styles.replyAvatar} source={{uri: 'http://dummyimage.com/1280x720/49e522)'}} />
         <View style={styles.reply}>
-          <Text style={styles.replyNickname}>{row.replyBy.nickname}</Text>
-          <Text style={styles.replyContent}>{row.content}</Text>
+          <Text style={styles.replyNickname}>标题说明</Text>
+          <Text style={styles.replyContent}>内容说明</Text>
         </View>
       </View>
     )
@@ -283,10 +283,10 @@ class Detail extends Component {
     return (
       <View style={styles.listHeader}>
         <View style={styles.infoBox}>
-          <Image style={styles.avatar} source={{uri: util.avatar(data.author.avatar)}} />
+          <Image style={styles.avatar} source={{uri: 'http://dummyimage.com/1280x720/49e522)'}} />
           <View style={styles.descBox}>
-            <Text style={styles.nickname}>{data.author.nickname}</Text>
-            <Text style={styles.title}>{data.title}</Text>
+            <Text style={styles.nickname}>标题撒旦法</Text>
+            <Text style={styles.title}>内容是打发健康了</Text>
           </View>
         </View>
         <View style={styles.commentBox}>
@@ -331,33 +331,33 @@ class Detail extends Component {
 
       var url = config.api.base + config.api.comment
 
-      request.post(url, body)
-        .then(function(data) {
-          if (data && data.success) {
-            var items = cachedResults.items.slice()
-            var content = that.state.content
+      // request.post(url, body)
+      //   .then(function(data) {
+      //     if (data && data.success) {
+      //       var items = cachedResults.items.slice()
+      //       var content = that.state.content
 
-            items = data.data.concat(items)
-            cachedResults.items = items
-            cachedResults.total = cachedResults.total + 1
+      //       items = data.data.concat(items)
+      //       cachedResults.items = items
+      //       cachedResults.total = cachedResults.total + 1
             
-            that.setState({
-              content: '',
-              isSending: false,
-              dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
-            })
+      //       that.setState({
+      //         content: '',
+      //         isSending: false,
+      //         dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
+      //       })
 
-            that._setModalVisible(false)
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-          that.setState({
-            isSending: false
-          })
-          that._setModalVisible(false)
-          AlertIOS.alert('留言失败，稍后重试！')
-        })
+      //       that._setModalVisible(false)
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     console.log(err)
+      //     that.setState({
+      //       isSending: false
+      //     })
+      //     that._setModalVisible(false)
+      //     AlertIOS.alert('留言失败，稍后重试！')
+      //   })
     })
   }
 
@@ -377,7 +377,7 @@ class Detail extends Component {
         <View style={styles.videoBox}>
           <Video
             ref='videoPlayer'
-            source={{uri: util.video(data.qiniu_video)}}
+            source={{uri: 'https://ob0h37q93.qnssl.com/waiting.mp4'}}
             style={styles.video}
             volume={5}
             paused={this.state.paused}
@@ -397,7 +397,7 @@ class Detail extends Component {
           }
 
           {
-            !this.state.videoLoaded && <ActivityIndicatorIOS color='#ee735c' style={styles.loading} />
+            !this.state.videoLoaded && <ActivityIndicator color='#ee735c' style={styles.loading} />
           }
 
           {

@@ -34,4 +34,4 @@ let video = function(key) {
   return config.qiniu.video + key
 }
 
-export default{thumb,avatar,video }
+export {thumb,avatar,video }

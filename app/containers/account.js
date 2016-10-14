@@ -31,8 +31,8 @@ import Progress from 'react-native-progress';
 import {ImagePickerManager} from 'NativeModules';
 var ImagePicker = ImagePickerManager;
 
-import request from '../common/request';
-import config from '../common/config';
+import {request} from '../common/request';
+import {config} from '../common/config';
 
 
 
@@ -134,24 +134,24 @@ class Account extends Component {
       var avartarData = 'data:image/jpeg;base64,' + res.data
       var uri = res.uri
 
-      that._getQiniuToken()
-        .then((data) => {
-          if (data && data.success) {
-            var token = data.data.token
-            var key = data.data.key
-            var body = new FormData()
+      // that._getQiniuToken()
+      //   .then((data) => {
+      //     if (data && data.success) {
+      //       var token = data.data.token
+      //       var key = data.data.key
+      //       var body = new FormData()
 
-            body.append('token', token)
-            body.append('key', key)
-            body.append('file', {
-              type: 'image/jpeg',
-              uri: uri,
-              name: key
-            })
+      //       body.append('token', token)
+      //       body.append('key', key)
+      //       body.append('file', {
+      //         type: 'image/jpeg',
+      //         uri: uri,
+      //         name: key
+      //       })
 
-            that._upload(body)
-          }
-        })
+      //       that._upload(body)
+      //     }
+      //   })
 
       // request.post(signatureURL, {
       //   accessToken: accessToken,
@@ -265,23 +265,23 @@ class Account extends Component {
     if (user && user.accessToken) {
       var url = config.api.base + config.api.update
 
-      request.post(url, user)
-        .then((data) => {
-          if (data && data.success) {
-            var user = data.data
+      // request.post(url, user)
+      //   .then((data) => {
+      //     if (data && data.success) {
+      //       var user = data.data
 
-            if (isAvatar) {
-              AlertIOS.alert('头像更新成功')
-            }
+      //       if (isAvatar) {
+      //         AlertIOS.alert('头像更新成功')
+      //       }
 
-            that.setState({
-              user: user
-            }, function() {
-              that._closeModal()
-              AsyncStorage.setItem('user', JSON.stringify(user))
-            })
-          }
-        })
+      //       that.setState({
+      //         user: user
+      //       }, function() {
+      //         that._closeModal()
+      //         AsyncStorage.setItem('user', JSON.stringify(user))
+      //       })
+      //     }
+      //   })
     }
   }
 
