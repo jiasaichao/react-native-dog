@@ -12,7 +12,9 @@ import {
   View,
   TabBarIOS,
   AsyncStorage,
-  Navigator
+  Navigator,
+  CameraRoll,
+  AlertIOS
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -22,7 +24,7 @@ import { Account } from './app/containers/account';
 import { Edit } from './app/containers/edit';
 import { Login } from './app/containers/login';
 import { Slider } from './app/containers/slider';
-
+import RNFetchBlob from 'react-native-fetch-blob'
 class jscapp extends Component {
   constructor(props) {
     super(props);
@@ -49,7 +51,7 @@ class jscapp extends Component {
 
   }
   _asyncAppStatus = () => {
-    
+
     AsyncStorage.multiGet(['user', 'entered'])
       .then((data) => {
         let userData = data[0][1];
