@@ -31,9 +31,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import Video from 'react-native-video';
 
-import {request} from '../common/request';
-import {config} from '../common/config';
-import {util} from '../common/util';
+import { request } from '../common/request';
+import { config } from '../common/config';
+import { util } from '../common/util';
 import Button from 'react-native-button';
 
 
@@ -48,7 +48,9 @@ var cachedResults = {
 class Detail extends Component {
   constructor(props) {
     super(props);
+    this.video={videoTotal:0,currentTime:0}
     var data = this.props.data
+    //console.log(this.props);
     var ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2
     })
@@ -60,9 +62,9 @@ class Detail extends Component {
 
       // video loads
       videoOk: true,
-      videoLoaded: false,
+      videoLoaded: true,
       playing: false,
-      paused: false,
+      paused: true,
       videoProgress: 0.01,
       videoTotal: 0,
       currentTime: 0,
@@ -80,62 +82,76 @@ class Detail extends Component {
       repeat: false
     };
   }
-  _pop=()=> {
+  _pop = () => {
     this.props.navigator.pop()
   }
 
-  _onLoadStart=()=> {
-    console.log('load start')
+  _onLoadStart = () => {
+    //console.log('load start')
   }
 
-  _onLoad=()=> {
-    console.log('loads')
+  _onLoad = () => {
+    //console.log('loads')
   }
 
-  _onProgress=(data)=> {
-    if (!this.state.videoLoaded) {
-      this.setState({
-        videoLoaded: true
-      })
+  // _onProgress = (data) => {
+  //   if (!this.state.videoLoaded) {
+  //     this.setState({
+  //       videoLoaded: true
+  //     })
+  //   }
+
+  //   var duration = data.playableDuration
+  //   var currentTime = data.currentTime
+  //   var percent = Number((currentTime / duration).toFixed(2))
+  //   var newState = {
+  //     videoTotal: duration,
+  //     currentTime: Number(data.currentTime.toFixed(2)),
+  //     videoProgress: percent
+  //   }
+
+  //   if (!this.state.videoLoaded) {
+  //     newState.videoLoaded = true
+  //   }
+  //   if (!this.state.playing) {
+  //     newState.playing = true
+  //   }
+
+  //   this.setState(newState)
+  // }
+
+  // _onEnd = () => {
+  //   this.setState({
+  //     videoProgress: 1,
+  //     playing: false
+  //   })
+  // }
+  /**暂停开始 */
+    _preview = () => {
+      //console.log('播放');
+        this.setState({ paused: !this.state.paused });
+    }
+    _onProgress = (data) => {
+        this.video.videoTotal = data.playableDuration;
+        this.video.currentTime = data.currentTime;
+    }
+    /**播放完成 */
+    _onEnd = () => {
+        this.refs.videoPlayer.seek(0)
+        this.setState({ paused: true });
     }
 
-    var duration = data.playableDuration
-    var currentTime = data.currentTime
-    var percent = Number((currentTime / duration).toFixed(2))
-    var newState = {
-      videoTotal: duration,
-      currentTime: Number(data.currentTime.toFixed(2)),
-      videoProgress: percent
-    }
-
-    if (!this.state.videoLoaded) {
-      newState.videoLoaded = true
-    }
-    if (!this.state.playing) {
-      newState.playing = true
-    }
-
-    this.setState(newState)
-  }
-
-  _onEnd=()=> {
-    this.setState({
-      videoProgress: 1,
-      playing: false
-    })
-  }
-
-  _onError=(e)=> {
+  _onError = (e) => {
     this.setState({
       videoOk: false
     })
   }
 
-  _rePlay=()=> {
+  _rePlay = () => {
     this.refs.videoPlayer.seek(0)
   }
 
-  _pause=()=> {
+  _pause = () => {
     if (!this.state.paused) {
       this.setState({
         paused: true
@@ -143,7 +159,7 @@ class Detail extends Component {
     }
   }
 
-  _resume=()=> {
+  _resume = () => {
     if (this.state.paused) {
       this.setState({
         paused: false
@@ -153,7 +169,13 @@ class Detail extends Component {
 
   componentDidMount() {
     var that = this
+    // AsyncStorage.getItem('list').then((data) => {
+    //   let list = [];
+    //   if (data) {
+    //     list = JSON.parse(data);
 
+    //   }
+    // });
     AsyncStorage.getItem('user')
       .then((data) => {
         var user
@@ -165,14 +187,14 @@ class Detail extends Component {
         if (user && user.accessToken) {
           that.setState({
             user: user
-          }, function() {
+          }, function () {
             that._fetchData()
           })
         }
       })
   }
 
-  _fetchData=(page)=> {
+  _fetchData = (page) => {
     var that = this
 
     this.setState({
@@ -193,7 +215,7 @@ class Detail extends Component {
     //         cachedResults.nextPage += 1
     //         cachedResults.items = items
     //         cachedResults.total = data.total
-            
+
     //         that.setState({
     //           isLoadingTail: false,
     //           dataSource: that.state.dataSource.cloneWithRows(cachedResults.items)
@@ -214,11 +236,11 @@ class Detail extends Component {
     //   })
   }
 
-  _hasMore=()=> {
+  _hasMore = () => {
     return cachedResults.items.length !== cachedResults.total
   }
 
-  _fetchMoreData=()=> {
+  _fetchMoreData = () => {
     if (!this._hasMore() || this.state.isLoadingTail) {
       this.setState({
         isLoadingTail: false
@@ -231,7 +253,7 @@ class Detail extends Component {
     this._fetchData(page)
   }
 
-  _renderFooter=()=> {
+  _renderFooter = () => {
     if (!this._hasMore() && cachedResults.total !== 0) {
       return (
         <View style={styles.loadingMore}>
@@ -247,10 +269,10 @@ class Detail extends Component {
     return <ActivityIndicator style={styles.loadingMore} />
   }
 
-  _renderRow=(row)=> {
+  _renderRow = (row) => {
     return (
       <View key={row._id} style={styles.replyBox}>
-        <Image style={styles.replyAvatar} source={{uri: 'http://dummyimage.com/1280x720/49e522)'}} />
+        <Image style={styles.replyAvatar} source={{ uri: 'http://dummyimage.com/1280x720/49e522)' }} />
         <View style={styles.reply}>
           <Text style={styles.replyNickname}>标题说明</Text>
           <Text style={styles.replyContent}>内容说明</Text>
@@ -259,31 +281,31 @@ class Detail extends Component {
     )
   }
 
-  _focus=()=> {
+  _focus = () => {
     this._setModalVisible(true)
   }
 
-  _blur=()=> {
+  _blur = () => {
 
   }
 
-  _closeModal=()=> {
+  _closeModal = () => {
     this._setModalVisible(false)
   }
 
-  _setModalVisible=(isVisible)=> {
+  _setModalVisible = (isVisible) => {
     this.setState({
       modalVisible: isVisible
     })
   }
 
-  _renderHeader=()=> {
+  _renderHeader = () => {
     var data = this.state.data
 
     return (
       <View style={styles.listHeader}>
         <View style={styles.infoBox}>
-          <Image style={styles.avatar} source={{uri: 'http://dummyimage.com/1280x720/49e522)'}} />
+          <Image style={styles.avatar} source={{ uri: 'http://dummyimage.com/1280x720/49e522)' }} />
           <View style={styles.descBox}>
             <Text style={styles.nickname}>标题撒旦法</Text>
             <Text style={styles.title}>内容是打发健康了</Text>
@@ -296,7 +318,7 @@ class Detail extends Component {
               style={styles.content}
               multiline={true}
               onFocus={this._focus}
-            />
+              />
           </View>
         </View>
 
@@ -307,7 +329,7 @@ class Detail extends Component {
     )
   }
 
-  _submit=()=> {
+  _submit = () => {
     var that = this
 
     if (!this.state.content) {
@@ -320,7 +342,7 @@ class Detail extends Component {
 
     this.setState({
       isSending: true
-    }, function() {
+    }, function () {
       var body = {
         accessToken: this.state.user.accessToken,
         comment: {
@@ -340,7 +362,7 @@ class Detail extends Component {
       //       items = data.data.concat(items)
       //       cachedResults.items = items
       //       cachedResults.total = cachedResults.total + 1
-            
+
       //       that.setState({
       //         content: '',
       //         isSending: false,
@@ -375,9 +397,18 @@ class Detail extends Component {
             视频详情页</Text>
         </View>
         <View style={styles.videoBox}>
-          <Video
+        <Video
+                        ref='videoPlayer'
+                        source={{ uri: this.state.data.video }}
+                        paused={this.state.paused}
+                        style={styles.video}
+                        onProgress={this._onProgress}
+                        onEnd={this._onEnd}
+                        />
+      {/** 
+      <Video
             ref='videoPlayer'
-            source={{uri: 'https://ob0h37q93.qnssl.com/waiting.mp4'}}
+            source={{ uri: 'https://ob0h37q93.qnssl.com/waiting.mp4' }}
             style={styles.video}
             volume={5}
             paused={this.state.paused}
@@ -390,7 +421,8 @@ class Detail extends Component {
             onLoad={this._onLoad}
             onProgress={this._onProgress}
             onEnd={this._onEnd}
-            onError={this._onError} />
+            onError={this._onError} />  
+      */}    
 
           {
             !this.state.videoOk && <Text style={styles.failText}>视频出错了！很抱歉</Text>
@@ -401,30 +433,31 @@ class Detail extends Component {
           }
 
           {
-            this.state.videoLoaded && !this.state.playing
-            ? <Icon
-                onPress={this._rePlay}
+            this.state.paused 
+              ? <Icon
+                onPress={this._preview}
                 name='ios-play'
                 size={48}
                 style={styles.playIcon} />
-            //: <Text></Text>
-            : null
+              //: <Text></Text>
+              : <TouchableOpacity style={styles.playnone} onPress={this._preview}>
+          </TouchableOpacity>
           }
 
           {
             this.state.videoLoaded && this.state.playing
-            ? <TouchableOpacity onPress={this._pause} style={styles.pauseBtn}>
-              {
-                this.state.paused
-                ? <Icon onPress={this._resume} size={48} name='ios-play' style={styles.resumeIcon} />
-                : null
-              }
-            </TouchableOpacity>
-            : null
+              ? <TouchableOpacity onPress={this._pause} style={styles.pauseBtn}>
+                {
+                  this.state.paused
+                    ? <Icon onPress={this._preview} size={48} name='ios-play' style={styles.resumeIcon} />
+                    : null
+                }
+              </TouchableOpacity>
+              : null
           }
 
           <View style={styles.progressBox}>
-            <View style={[styles.progressBar, {width: width * this.state.videoProgress}]}></View>
+            <View style={[styles.progressBar, { width: width * this.state.videoProgress }]}></View>
           </View>
         </View>
 
@@ -438,7 +471,7 @@ class Detail extends Component {
           enableEmptySections={true}
           showsVerticalScrollIndicator={false}
           automaticallyAdjustContentInsets={false}
-        />
+          />
 
         <Modal
           visible={this.state.modalVisible}>
@@ -459,8 +492,8 @@ class Detail extends Component {
                     this.setState({
                       content: text
                     })
-                  }}
-                />
+                  } }
+                  />
               </View>
             </View>
 
@@ -599,6 +632,14 @@ var styles = StyleSheet.create({
     borderRadius: 30,
     color: '#ed7b66'
   },
+  playnone: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right:0,
+    bottom:0,
+    backgroundColor: 'transparent',
+  },
 
   pauseBtn: {
     position: 'absolute',
@@ -719,4 +760,4 @@ var styles = StyleSheet.create({
     borderBottomColor: '#eee'
   }
 })
-export {Detail}
+export { Detail }

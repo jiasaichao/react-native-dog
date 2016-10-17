@@ -13,6 +13,7 @@ import {
   TabBarIOS,
   Navigator,
   TouchableHighlight,
+  TouchableOpacity,
   ListView,
   Image,
   Dimensions,
@@ -29,8 +30,8 @@ import { config } from '../common/config';
 import util from '../common/util';
 import Mock from 'mockjs';
 
-import {Detail} from './detail'
-
+import { Detail } from './detail'
+import Video from 'react-native-video';
 
 var width = Dimensions.get('window').width
 
@@ -46,9 +47,19 @@ class Item extends Component {
     let row = this.props.row
     this.state = {
       up: row.voted,
-      row: row
+      row: row,
+       paused: true
     };
   }
+  /**暂停开始 */
+    _preview = () => {
+        this.setState({ paused: !this.state.paused });
+    }
+    /**播放完成 */
+    _onEnd = () => {
+        this.refs.videoPlayer.seek(0)
+        this.setState({ paused: true });
+    }
   _up = () => {
     var that = this
     var up = !this.state.up
@@ -81,20 +92,20 @@ class Item extends Component {
 
   render() {
     var row = this.state.row
-
+console.log(row);
     return (
-      <TouchableHighlight onPress={this.props.onSelect}>
+      <TouchableOpacity onPress={this.props.onSelect}>
         <View style={styles.item}>
           <Text style={styles.title}>{row.title}</Text>
-          <Image
-            source={{ uri: row.thumb }}
-            style={styles.thumb}
-            >
-            <Icon
-              name='ios-play'
-              size={28}
-              style={styles.play} />
-          </Image>
+          <Video
+                            ref='videoPlayer'
+                            source={{ uri: row.video }}
+                            paused={this.state.paused}
+                            style={styles.thumb}
+                            onProgress={this._onProgress}
+                            onEnd={this._onEnd}
+                            />
+          
           <View style={styles.itemFooter}>
             <View style={styles.handleBox}>
               <Icon
@@ -113,7 +124,7 @@ class Item extends Component {
             </View>
           </View>
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     )
   }
 }
@@ -156,8 +167,14 @@ class List extends Component {
     //       })
     //     }
     //   });
-
-    that._fetchData(0)
+    AsyncStorage.getItem('list').then(data => {
+      let list = [];
+      if (data) {
+        list = JSON.parse(data);
+        this.setState({ dataSource: that.state.dataSource.cloneWithRows(list) });
+      }
+    });
+    //that._fetchData(0)
   }
 
   _fetchData = (page) => {
@@ -175,73 +192,73 @@ class List extends Component {
     }
 
     var user = this.state.user
-  
-    
+
+
     that.setState({
-                isRefreshing: false,
-                dataSource: that.state.dataSource.cloneWithRows( [
+      isRefreshing: false,
+      dataSource: that.state.dataSource.cloneWithRows([
         {
-            "id": "640000199409145329",
-            "thumb": "http://dummyimage.com/1280x720/49e522)",
-            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
-            "video": "''"
+          "id": "640000199409145329",
+          "thumb": "http://dummyimage.com/1280x720/49e522)",
+          "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+          "video": "''"
         },
         {
-            "id": "520000199806149975",
-            "thumb": "http://dummyimage.com/1280x720/31b57b)",
-            "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
-            "video": "''"
+          "id": "520000199806149975",
+          "thumb": "http://dummyimage.com/1280x720/31b57b)",
+          "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
+          "video": "''"
         },
         {
-            "id": "130000201210233663",
-            "thumb": "http://dummyimage.com/1280x720/910025)",
-            "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
-            "video": "''"
+          "id": "130000201210233663",
+          "thumb": "http://dummyimage.com/1280x720/910025)",
+          "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
+          "video": "''"
         },
         {
-            "id": "530000198711055770",
-            "thumb": "http://dummyimage.com/1280x720/111bbd)",
-            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
-            "video": "''"
+          "id": "530000198711055770",
+          "thumb": "http://dummyimage.com/1280x720/111bbd)",
+          "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+          "video": "''"
         },
         {
-            "id": "710000197806241380",
-            "thumb": "http://dummyimage.com/1280x720/dbc035)",
-            "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
-            "video": "''"
+          "id": "710000197806241380",
+          "thumb": "http://dummyimage.com/1280x720/dbc035)",
+          "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
+          "video": "''"
         },
         {
-            "id": "210000199602175394",
-            "thumb": "http://dummyimage.com/1280x720/827ce0)",
-            "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
-            "video": "''"
+          "id": "210000199602175394",
+          "thumb": "http://dummyimage.com/1280x720/827ce0)",
+          "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
+          "video": "''"
         },
         {
-            "id": "310000200612026818",
-            "thumb": "http://dummyimage.com/1280x720/018e3a)",
-            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
-            "video": "''"
+          "id": "310000200612026818",
+          "thumb": "http://dummyimage.com/1280x720/018e3a)",
+          "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+          "video": "''"
         },
         {
-            "id": "500000198012307654",
-            "thumb": "http://dummyimage.com/1280x720/c8d004)",
-            "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
-            "video": "''"
+          "id": "500000198012307654",
+          "thumb": "http://dummyimage.com/1280x720/c8d004)",
+          "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
+          "video": "''"
         },
         {
-            "id": "210000197803303306",
-            "thumb": "http://dummyimage.com/1280x720/d96305)",
-            "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
-            "video": "''"
+          "id": "210000197803303306",
+          "thumb": "http://dummyimage.com/1280x720/d96305)",
+          "title": "次该叫文果省至口毛到值难响作值计增八。形运满过受学非王越保将进教面。",
+          "video": "''"
         },
         {
-            "id": "33000019800607993X",
-            "thumb": "http://dummyimage.com/1280x720/ae4eec)",
-            "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
-            "video": "''"
+          "id": "33000019800607993X",
+          "thumb": "http://dummyimage.com/1280x720/ae4eec)",
+          "title": "几土位效近议光书机办术别片般。引业知术说文厂复六门太标。用条们走长论统龙确保他布清解己音",
+          "video": "''"
         }
-    ])
-              })
+      ])
+    })
   }
 
   _hasMore = () => {
@@ -264,11 +281,18 @@ class List extends Component {
   }
 
   _onRefresh = () => {
-    if (!this._hasMore() || this.state.isRefreshing) {
-      return
-    }
-
-    this._fetchData(0)
+    // if (!this._hasMore() || this.state.isRefreshing) {
+    //   return
+    // }
+    console.log('刷新');
+AsyncStorage.getItem('list').then(data => {
+      let list = [];
+      if (data) {
+        list = JSON.parse(data);
+        this.setState({ dataSource: this.state.dataSource.cloneWithRows(list) });
+      }
+    });
+    //this._fetchData(0)
   }
 
   _renderFooter = () => {
@@ -288,7 +312,7 @@ class List extends Component {
   }
 
   _loadPage = (row) => {
-    console.log('将要跳转路由',this.props.navigator);
+    //console.log('将要跳转路由', this.props.navigator);
     this.props.navigator.push({
       name: 'detail',
       component: Detail,
@@ -355,8 +379,7 @@ var styles = StyleSheet.create({
 
   thumb: {
     width: width,
-    height: width * 0.56,
-    resizeMode: 'cover'
+    height: width * 0.56
   },
 
   title: {

@@ -75,7 +75,10 @@ class Account extends Component {
       user: user,
       avatarProgress: 0,
       avatarUploading: false,
-      modalVisible: false
+      modalVisible: false,
+
+
+      gougoutouxiang:'',
     };
   }
   _edit=()=> {
@@ -133,7 +136,7 @@ class Account extends Component {
 
       var avartarData = 'data:image/jpeg;base64,' + res.data
       var uri = res.uri
-
+this.setState({gougoutouxiang:uri});
       // that._getQiniuToken()
       //   .then((data) => {
       //     if (data && data.success) {
@@ -302,6 +305,12 @@ class Account extends Component {
   _logout=()=> {
     this.props.logout()
   }
+  _qingchu=()=>{
+    AsyncStorage.removeItem('list');
+  }
+  _qingchuall=()=>{
+this.props.allout();
+  }
 
   render() {
     var user = this.state.user
@@ -314,9 +323,9 @@ class Account extends Component {
         </View>
 
         {
-          user.avatar
+          this.state.gougoutouxiang!==''
           ? <TouchableOpacity onPress={this._pickPhoto} style={styles.avatarContainer}>
-            <Image source={{uri: avatar(user.avatar, 'image')}} style={styles.avatarContainer}>
+            <Image source={{uri:this.state.gougoutouxiang}} style={styles.avatarContainer}>
               <View style={styles.avatarBox}>
                 {
                   this.state.avatarUploading
@@ -326,7 +335,7 @@ class Account extends Component {
                     color={'#ee735c'}
                     progress={this.state.avatarProgress} />
                   : <Image
-                    source={{uri: avatar(user.avatar, 'image')}}
+                    source={{uri: this.state.gougoutouxiang}}
                     style={styles.avatar} />
                 }
               </View>
@@ -433,6 +442,12 @@ class Account extends Component {
         <Button
           style={styles.btn}
           onPress={this._logout}>退出登录</Button>
+          <Button
+          style={styles.btn}
+          onPress={this._qingchu}>清除list数据</Button>
+          <Button
+          style={styles.btn}
+          onPress={this._qingchuall}>退出到轮播</Button>
       </View>
     )
   }
@@ -555,6 +570,7 @@ var styles = StyleSheet.create({
   },
 
   btn: {
+    flex:1,
     marginTop: 25,
     padding: 10,
     marginLeft: 10,

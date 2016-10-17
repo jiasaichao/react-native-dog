@@ -56,10 +56,18 @@ class Edit extends Component {
         super(props);
         this.item = {
             "id": "710000197806241380",
-            "thumb": "http://dummyimage.com/1280x720/dbc035)",
-            "title": "南作有层消场听论百公更金。去设元革适水市社了展更油族结示党。感建周过者才到算大四因放本小。",
+            "thumb": "http://dummyimage.com/1280x720/dbc035",
+            "title": "",
             "video": "''"
         };
+        this.video = {
+            videoTotal: 0,
+            currentTime: 0,
+            /**进度,计算属性0-1之间小数 */
+            videoProgress() {
+                return Number((this.currentTime / this.videoTotal).toFixed(2))
+            }
+        }
         this.state = {
             /**是否已上传视频 */
             isUpdate: false,
@@ -87,33 +95,102 @@ class Edit extends Component {
             if (res.didCancel) {
                 return
             }
+            if ('error' in res) {
+                return;
+            }
             this.item.video = res.uri;
-            AlertIOS.alert('成功加载');
             this.setState({ isUpdate: true });
         });
     }
-    _preview=()=>{
-        this.setState({paused:!this.state.paused});
+    /**暂停开始 */
+    _preview = () => {
+        this.setState({ paused: !this.state.paused });
+    }
+    _onProgress = (data) => {
+        this.video.videoTotal = data.playableDuration;
+        this.video.currentTime = data.currentTime;
+    }
+    /**播放完成 */
+    _onEnd = () => {
+        this.refs.videoPlayer.seek(0)
+        this.setState({ paused: true });
+    }
+    _submit = () => {
+        if (this.item.title === '') {
+            AlertIOS.alert('请输入标题');
+        }
+        else {
+            AsyncStorage.getItem('list').then((data) => {
+                let list = [];
+                if (data) {
+                    list = JSON.parse(data);
+                }
+                this.item.id = global.getId();
+                list.push(this.item);
+
+                AsyncStorage.setItem('list', JSON.stringify(list))
+                    .then(() => {
+                        //重置
+                        this.setState({
+                            isUpdate: false,
+                            paused: true
+                        });
+                        AlertIOS.alert('保存成功');
+                    });
+
+
+            });
+        }
     }
     render() {
 
         let content;
         if (this.state.isUpdate) {
+            let playButton;
+            if (this.state.paused) {
+                playButton = <TouchableOpacity style={styles.previewBox} onPress={this._preview}>
+                    <Icon name='ios-play' style={styles.previewIcon} />
+                    <Text style={styles.previewText}>
+                        播放
+                        </Text>
+                </TouchableOpacity>
+            }
+            else {
+                playButton = <TouchableOpacity style={styles.previewBox} onPress={this._preview}>
+                    <Icon name='ios-pause' style={styles.previewIcon} />
+                    <Text style={styles.previewText}>
+                        暂停
+                        </Text>
+                </TouchableOpacity>
+            }
             content = <View style={styles.videoContainer}>
                 <View style={styles.videoBox}>
-                    <Video
-                        ref='videoPlayer'
-                        source={{ uri: this.item.video }}
-                        paused={this.state.paused}
-                        style={styles.video}
-                        />
-                    <View style={styles.previewBox}>
-                        <Icon name='ios-play' style={styles.previewIcon} />
-                        <Text style={styles.previewText} onPress={this._preview}>
-                            预览
-                        </Text>
+
+                    <View style={styles.video}>
+                        <Video
+                            ref='videoPlayer'
+                            source={{ uri: this.item.video }}
+                            paused={this.state.paused}
+                            style={styles.video}
+                            onProgress={this._onProgress}
+                            onEnd={this._onEnd}
+                            />
                     </View>
+                    {playButton}
                 </View>
+                <View style={styles.fieldItem}>
+                    <Text style={styles.label}>标题</Text>
+                    <TextInput
+                        placeholder={'输入你的昵称'}
+                        style={styles.inputField}
+                        autoCapitalize={'none'}
+                        autoCorrect={false}
+                        onChangeText={(text) => {
+                            this.item.title = text;
+                        } }
+                        />
+                </View>
+                <Button style={styles.btn} onPress={this._submit}>保存资料</Button>
             </View>
         }
         else {
@@ -333,7 +410,10 @@ var styles = StyleSheet.create({
         paddingTop: 50,
         backgroundColor: '#fff'
     },
-
+    label: {
+        color: '#ccc',
+        marginRight: 10
+    },
     closeIcon: {
         position: 'absolute',
         fontSize: 32,
@@ -365,10 +445,19 @@ var styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#eaeaea',
     },
-
+    fieldItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: 50,
+        paddingLeft: 15,
+        paddingRight: 15,
+        borderColor: '#eee',
+        borderBottomWidth: 1
+    },
     inputField: {
-        height: 36,
-        textAlign: 'center',
+        flex: 1,
+        height: 50,
         color: '#666',
         fontSize: 14
     },
@@ -379,7 +468,8 @@ var styles = StyleSheet.create({
     },
 
     btn: {
-        marginTop: 65,
+        width: width - 20,
+        marginTop: 25,
         padding: 10,
         marginLeft: 10,
         marginRight: 10,

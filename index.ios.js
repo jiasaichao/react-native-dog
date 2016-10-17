@@ -144,7 +144,7 @@ class jscapp extends Component {
               selectedTab: 'account'
             })
           } }>
-          <Account user={this.state.user} logout={this._logout} />
+          <Account user={this.state.user} logout={this._logout} allout={()=>{this.setState({entered:false})}} />
         </Icon.TabBarItem>
       </TabBarIOS>
     );
@@ -169,6 +169,16 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
-
+AsyncStorage.getItem('maxid').then(data => {
+  let maxid = 0;
+  if (data) {
+    maxid = Number(data);
+  }
+  global.getId = () => {
+    maxid++;
+    AsyncStorage.setItem('maxid',maxid.toString());
+    return maxid
+  }
+})
 
 AppRegistry.registerComponent('jscapp', () => jscapp);
