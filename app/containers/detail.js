@@ -50,7 +50,6 @@ class Detail extends Component {
     super(props);
     this.video={videoTotal:0,currentTime:0}
     var data = this.props.data
-    //console.log(this.props);
     var ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2
     })
@@ -87,11 +86,9 @@ class Detail extends Component {
   }
 
   _onLoadStart = () => {
-    //console.log('load start')
   }
 
   _onLoad = () => {
-    //console.log('loads')
   }
 
   // _onProgress = (data) => {
@@ -128,7 +125,6 @@ class Detail extends Component {
   // }
   /**暂停开始 */
     _preview = () => {
-      //console.log('播放');
         this.setState({ paused: !this.state.paused });
     }
     _onProgress = (data) => {
@@ -232,7 +228,6 @@ class Detail extends Component {
     //     this.setState({
     //       isLoadingTail: false
     //     })
-    //     console.warn(error)
     //   })
   }
 
@@ -373,7 +368,6 @@ class Detail extends Component {
       //     }
       //   })
       //   .catch((err) => {
-      //     console.log(err)
       //     that.setState({
       //       isSending: false
       //     })
@@ -388,14 +382,6 @@ class Detail extends Component {
 
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backBox} onPress={this._pop}>
-            <Icon name='ios-arrow-back' style={styles.backIcon} />
-            <Text style={styles.backText}>返回</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOflines={1}>
-            视频详情页</Text>
-        </View>
         <View style={styles.videoBox}>
         <Video
                         ref='videoPlayer'
@@ -578,13 +564,13 @@ var styles = StyleSheet.create({
   videoBox: {
     width: width,
     height: width * 0.56,
-    backgroundColor: '#000'
+    backgroundColor: '#fff'
   },
 
   video: {
     width: width,
     height: width * 0.56,
-    backgroundColor: '#000'
+    backgroundColor: '#fff'
   },
 
   failText: {

@@ -92,9 +92,8 @@ class Item extends Component {
 
   render() {
     var row = this.state.row
-console.log(row);
     return (
-      <TouchableOpacity onPress={this.props.onSelect}>
+      <TouchableOpacity  onPress={this.props.onSelect}>
         <View style={styles.item}>
           <Text style={styles.title}>{row.title}</Text>
           <Video
@@ -284,7 +283,6 @@ class List extends Component {
     // if (!this._hasMore() || this.state.isRefreshing) {
     //   return
     // }
-    console.log('刷新');
 AsyncStorage.getItem('list').then(data => {
       let list = [];
       if (data) {
@@ -314,20 +312,27 @@ AsyncStorage.getItem('list').then(data => {
   _loadPage = (row) => {
     //console.log('将要跳转路由', this.props.navigator);
     this.props.navigator.push({
-      name: 'detail',
-      component: Detail,
-      params: {
-        data: row
-      }
-    })
+      title: row.title,
+      screen: "detail",
+      passProps:{data: row},
+      navigatorStyle:{
+        navBarButtonColor:'#fff'
+      },
+      backButtonTitle:'返回'
+    });
+    // this.props.navigator.push({
+    //   name: 'detail',
+    //   component: Detail,
+    //   params: {
+    //     data: row
+    //   }
+    // })
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>列表页面</Text>
-        </View>
+       
         <ListView
           dataSource={this.state.dataSource}
           renderRow={this._renderRow}

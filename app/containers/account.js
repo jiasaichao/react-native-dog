@@ -28,11 +28,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import sha1 from 'sha1';
 import Button from 'react-native-button';
 import Progress from 'react-native-progress';
-import {ImagePickerManager} from 'NativeModules';
+import { ImagePickerManager } from 'NativeModules';
 var ImagePicker = ImagePickerManager;
 
-import {request} from '../common/request';
-import {config} from '../common/config';
+import { request } from '../common/request';
+import { config } from '../common/config';
 
 
 
@@ -46,8 +46,8 @@ var photoOptions = {
   quality: 0.75,
   allowsEditing: true,
   noData: false,
-  storageOptions: { 
-    skipBackup: true, 
+  storageOptions: {
+    skipBackup: true,
     path: 'images'
   }
 }
@@ -78,24 +78,40 @@ class Account extends Component {
       modalVisible: false,
 
 
-      gougoutouxiang:'',
+      gougoutouxiang: '',
     };
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
   }
-  _edit=()=> {
+  static navigatorStyle = {
+    navBarButtonColor: '#fff'
+  };
+  static navigatorButtons = {
+    rightButtons: [{
+      title: '编辑',
+      id: 'edit'
+    }]
+  };
+  onNavigatorEvent(event) { // this is the onPress handler for the two buttons together
+    if (event.type == 'NavBarButtonPress') { // this is the event type for button presses
+      if (event.id == 'edit') { // this is the same id field from the static navigatorButtons definition
+        this._edit();
+      }
+    }
+  }
+  _edit = () => {
     this.setState({
       modalVisible: true
     })
   }
 
-  _closeModal=()=> {
+  _closeModal = () => {
     this.setState({
       modalVisible: false
     })
   }
 
   componentDidMount() {
-    var that = this
-    
+    var that = this;
     AsyncStorage.getItem('user')
       .then((data) => {
         var user
@@ -112,7 +128,7 @@ class Account extends Component {
       })
   }
 
-  _getQiniuToken=()=>{
+  _getQiniuToken = () => {
     var accessToken = this.state.user.accessToken
     var signatureURL = config.api.base + config.api.signature
 
@@ -121,12 +137,12 @@ class Account extends Component {
       type: 'avatar',
       cloud: 'qiniu'
     })
-    .catch((err) => {
-      console.log(err)
-    })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
-  _pickPhoto=()=> {
+  _pickPhoto = () => {
     var that = this
 
     ImagePicker.showImagePicker(photoOptions, (res) => {
@@ -136,7 +152,7 @@ class Account extends Component {
 
       var avartarData = 'data:image/jpeg;base64,' + res.data
       var uri = res.uri
-this.setState({gougoutouxiang:uri});
+      this.setState({ gougoutouxiang: uri });
       // that._getQiniuToken()
       //   .then((data) => {
       //     if (data && data.success) {
@@ -186,12 +202,12 @@ this.setState({gougoutouxiang:uri});
     })
   }
 
-  _upload=(body)=> {
+  _upload = (body) => {
     var that = this
     var xhr = new XMLHttpRequest()
     var url = config.qiniu.upload
 
-    console.log(body)
+   
 
     this.setState({
       avatarUploading: true,
@@ -202,7 +218,7 @@ this.setState({gougoutouxiang:uri});
     xhr.onload = () => {
       if (xhr.status !== 200) {
         AlertIOS.alert('请求失败')
-        console.log(xhr.responseText)
+     
 
         return
       }
@@ -219,8 +235,6 @@ this.setState({gougoutouxiang:uri});
         response = JSON.parse(xhr.response)
       }
       catch (e) {
-        console.log(e)
-        console.log('parse fails')
       }
 
       console.log(response)
@@ -231,7 +245,7 @@ this.setState({gougoutouxiang:uri});
         if (response.public_id) {
           user.avatar = response.public_id
         }
-        
+
         if (response.key) {
           user.avatar = response.key
         }
@@ -261,7 +275,7 @@ this.setState({gougoutouxiang:uri});
     xhr.send(body)
   }
 
-  _asyncUser=(isAvatar)=>{
+  _asyncUser = (isAvatar) => {
     var that = this
     var user = this.state.user
 
@@ -288,7 +302,7 @@ this.setState({gougoutouxiang:uri});
     }
   }
 
-  _changeUserState=(key,value)=> {
+  _changeUserState = (key, value) => {
     var user = this.state.user
 
     user[key] = value
@@ -298,18 +312,18 @@ this.setState({gougoutouxiang:uri});
     })
   }
 
-  _submit=()=> {
+  _submit = () => {
     this._asyncUser()
   }
 
-  _logout=()=> {
+  _logout = () => {
     this.props.logout()
   }
-  _qingchu=()=>{
+  _qingchu = () => {
     AsyncStorage.removeItem('list');
   }
-  _qingchuall=()=>{
-this.props.allout();
+  _qingchuall = () => {
+    this.props.allout();
   }
 
   render() {
@@ -317,47 +331,44 @@ this.props.allout();
 
     return (
       <View style={styles.container}>
-        <View style={styles.toolbar}>
-          <Text style={styles.toolbarTitle}>狗狗的账户</Text>
-          <Text style={styles.toolbarExtra} onPress={this._edit}>编辑</Text>
-        </View>
+
 
         {
-          this.state.gougoutouxiang!==''
-          ? <TouchableOpacity onPress={this._pickPhoto} style={styles.avatarContainer}>
-            <Image source={{uri:this.state.gougoutouxiang}} style={styles.avatarContainer}>
+          this.state.gougoutouxiang !== ''
+            ? <TouchableOpacity onPress={this._pickPhoto} style={styles.avatarContainer}>
+              <Image source={{ uri: this.state.gougoutouxiang }} style={styles.avatarContainer}>
+                <View style={styles.avatarBox}>
+                  {
+                    this.state.avatarUploading
+                      ? <Progress.Circle
+                        showsText={true}
+                        size={75}
+                        color={'#ee735c'}
+                        progress={this.state.avatarProgress} />
+                      : <Image
+                        source={{ uri: this.state.gougoutouxiang }}
+                        style={styles.avatar} />
+                  }
+                </View>
+                <Text style={styles.avatarTip}>戳这里换头像</Text>
+              </Image>
+            </TouchableOpacity>
+            : <TouchableOpacity onPress={this._pickPhoto} style={styles.avatarContainer}>
+              <Text style={styles.avatarTip}>添加狗狗头像</Text>
               <View style={styles.avatarBox}>
                 {
                   this.state.avatarUploading
-                  ? <Progress.Circle
-                    showsText={true}
-                    size={75}
-                    color={'#ee735c'}
-                    progress={this.state.avatarProgress} />
-                  : <Image
-                    source={{uri: this.state.gougoutouxiang}}
-                    style={styles.avatar} />
+                    ? <Progress.Circle
+                      showsText={true}
+                      size={75}
+                      color={'#ee735c'}
+                      progress={this.state.avatarProgress} />
+                    : <Icon
+                      name='ios-cloud-upload-outline'
+                      style={styles.plusIcon} />
                 }
               </View>
-              <Text style={styles.avatarTip}>戳这里换头像</Text>
-            </Image>
-          </TouchableOpacity>
-          : <TouchableOpacity onPress={this._pickPhoto} style={styles.avatarContainer}>
-            <Text style={styles.avatarTip}>添加狗狗头像</Text>
-            <View style={styles.avatarBox}>
-              {
-                this.state.avatarUploading
-                ? <Progress.Circle
-                    showsText={true}
-                    size={75}
-                    color={'#ee735c'}
-                    progress={this.state.avatarProgress} />
-                : <Icon          
-                    name='ios-cloud-upload-outline'
-                    style={styles.plusIcon} />
-              }
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
         }
 
         <Modal
@@ -368,7 +379,7 @@ this.props.allout();
               name='ios-close-outline'
               onPress={this._closeModal}
               style={styles.closeIcon} />
-            
+
             <View style={styles.fieldItem}>
               <Text style={styles.label}>昵称</Text>
               <TextInput
@@ -379,8 +390,8 @@ this.props.allout();
                 defaultValue={user.nickname}
                 onChangeText={(text) => {
                   this._changeUserState('nickname', text)
-                }}
-              />
+                } }
+                />
             </View>
 
             <View style={styles.fieldItem}>
@@ -393,8 +404,8 @@ this.props.allout();
                 defaultValue={user.breed}
                 onChangeText={(text) => {
                   this._changeUserState('breed', text)
-                }}
-              />
+                } }
+                />
             </View>
 
             <View style={styles.fieldItem}>
@@ -407,8 +418,8 @@ this.props.allout();
                 defaultValue={user.age}
                 onChangeText={(text) => {
                   this._changeUserState('age', text)
-                }}
-              />
+                } }
+                />
             </View>
 
             <View style={styles.fieldItem}>
@@ -416,7 +427,7 @@ this.props.allout();
               <Icon.Button
                 onPress={() => {
                   this._changeUserState('gender', 'male')
-                }}
+                } }
                 style={[
                   styles.gender,
                   user.gender === 'male' && styles.genderChecked
@@ -425,7 +436,7 @@ this.props.allout();
               <Icon.Button
                 onPress={() => {
                   this._changeUserState('gender', 'female')
-                }}
+                } }
                 style={[
                   styles.gender,
                   user.gender === 'female' && styles.genderChecked
@@ -442,10 +453,10 @@ this.props.allout();
         <Button
           style={styles.btn}
           onPress={this._logout}>退出登录</Button>
-          <Button
+        <Button
           style={styles.btn}
           onPress={this._qingchu}>清除list数据</Button>
-          <Button
+        <Button
           style={styles.btn}
           onPress={this._qingchuall}>退出到轮播</Button>
       </View>
@@ -570,7 +581,7 @@ var styles = StyleSheet.create({
   },
 
   btn: {
-    flex:1,
+    flex: 1,
     marginTop: 25,
     padding: 10,
     marginLeft: 10,
@@ -583,4 +594,4 @@ var styles = StyleSheet.create({
   }
 
 })
-export  {Account}
+export { Account }

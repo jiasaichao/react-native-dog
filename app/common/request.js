@@ -10,10 +10,12 @@ request.get = function(url, params) {
   if (params) {
     url += '?' + queryString.stringify(params)
   }
-console.log('请求地址',url)
+//console.log('请求地址',url)
   return fetch(url)
     .then((response) =>{ return response.json()} )
-    .then((response) => {console.log('执行到了值',Mock.mock(response)); return Mock.mock(response)})
+    .then((response) => {
+      //console.log('执行到了值',Mock.mock(response)); return Mock.mock(response)
+    })
 }
 
 request.post = function(url, body) {

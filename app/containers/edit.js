@@ -204,12 +204,6 @@ class Edit extends Component {
         }
         return (
             <View style={styles.container}>
-                <View style={styles.toolbar}>
-                    <Text style={styles.toolbarTitle}>
-                        理解狗狗，从配音开始
-          </Text>
-                </View>
-
                 <View style={styles.page}>
                     {content}
                 </View>
